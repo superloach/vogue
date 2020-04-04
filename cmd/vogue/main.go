@@ -2,37 +2,40 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
 
 	"github.com/superloach/vogue"
 )
 
-var debug = flag.Bool("debug", false, "print extra info to stderr")
-
-func init() {
-	flag.Parse()
-}
-
-func debugln(args ...interface{}) {
-	if !*debug {
-		return
-	}
-
-	fmt.Fprintln(os.Stderr, args...)
-}
-
 func main() {
-	vg, err := vogue.MkVogue()
+	flag.Parse()
+	args := flag.Args()
+
+	v, err := vogue.NewVogue()
 	if err != nil {
 		panic(err)
 	}
+	defer v.Fini()
 
-	err = vg.Init()
+	if len(args) == 0 {
+		v.Tabs.Buffers = append(
+			v.Tabs.Buffers,
+			vogue.BufEmpty(),
+		)
+	}
+
+	for _, arg := range args {
+		buf, err := vogue.BufFile(arg)
+		if err != nil {
+			panic(err)
+		}
+
+		v.Tabs.Buffers = append(v.Tabs.Buffers, buf)
+	}
+
+	v.Fresh()
+
+	err = v.Run()
 	if err != nil {
 		panic(err)
 	}
-
-	vg.Fresh()
-	vg.Run()
 }

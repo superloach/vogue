@@ -3,44 +3,46 @@ package vogue
 import "github.com/gdamore/tcell"
 
 type Status struct {
-	Screen tcell.Screen
-	Style  tcell.Style
-	Left   string
-	Center string
-	Right  string
+	Left   func() string
+	Center func() string
+	Right  func() string
 }
 
-func MkStatus(scr tcell.Screen, style tcell.Style) (*Status, error) {
-	s := Status{}
+func (s *Status) Fresh(screen tcell.Screen, style tcell.Style) error {
+	var left, center, right string
 
-	s.Screen = scr
-	s.Style = style
+	w, _ := screen.Size()
 
-	return &s, nil
-}
+	if s.Left != nil {
+		left = s.Left()
+	}
+	loff := 1
 
-func (s *Status) Fresh() {
-	w, _ := s.Screen.Size()
+	if s.Center != nil {
+		center = s.Center()
+	}
+	coff := (w / 2) - (len(center) / 2)
+
+	if s.Right != nil {
+		right = s.Right()
+	}
+	roff := w - len(right) - 1
 
 	for i := 0; i < w; i++ {
-		s.Screen.SetContent(i, 0, ' ', nil, s.Style)
+		screen.SetContent(i, 0, ' ', nil, style)
 	}
 
-	for i, r := range []rune(s.Left) {
-		s.Screen.SetContent(i, 0, r, nil, s.Style)
+	for i, r := range left {
+		screen.SetContent(loff+i, 0, r, nil, style)
 	}
 
-	for i, r := range []rune(s.Center) {
-		s.Screen.SetContent(
-			(w-len(s.Center))/2+i,
-			0, r, nil, s.Style,
-		)
+	for i, r := range center {
+		screen.SetContent(coff+i, 0, r, nil, style)
 	}
 
-	for i, r := range []rune(s.Right) {
-		s.Screen.SetContent(
-			w-len(s.Right)+i,
-			0, r, nil, s.Style,
-		)
+	for i, r := range right {
+		screen.SetContent(roff+i, 0, r, nil, style)
 	}
+
+	return nil
 }

@@ -1,46 +1,51 @@
 package vogue
 
-import "github.com/gdamore/tcell"
+import (
+	"fmt"
+	"time"
+
+	"github.com/gdamore/tcell"
+)
 
 type Vogue struct {
 	Screen tcell.Screen
+
+	Config Config
+
 	Status *Status
+	Tabs   *Tabs
 }
 
-func MkVogue() (*Vogue, error) {
-	v := Vogue{}
+func NewVogue() (*Vogue, error) {
+	v := &Vogue{}
 
-	scr, err := tcell.NewScreen()
+	screen, err := tcell.NewScreen()
 	if err != nil {
 		return nil, err
 	}
-	v.Screen = scr
+	v.Screen = screen
+	v.Screen.EnableMouse()
 
-	status, err := MkStatus(
-		v.Screen,
-		tcell.StyleDefault.
-			Foreground(tcell.ColorBlack).
-			Background(tcell.ColorWhite),
-	)
+	cfg, err := LoadConfig()
 	if err != nil {
-		return nil, err
+		cfg = make(Config)
 	}
-	v.Status = status
+	v.Config = cfg
 
-	return &v, nil
-}
-
-func (v *Vogue) Init() error {
-	err := v.Screen.Init()
-	if err != nil {
-		return err
+	v.Status = &Status{
+		Left: func() string {
+			buf := v.Tabs.Buffer()
+			return fmt.Sprintf("%d:%d", buf.Line, buf.Col)
+		},
+		Center: func() string {
+			return "vogue"
+		},
+		Right: func() string {
+			return time.Now().Format(time.Kitchen)
+		},
 	}
 
-	v.Screen.Clear()
+	v.Tabs = NewTabs()
 
-	return nil
-}
-
-func (v *Vogue) Fini() {
-	v.Screen.Fini()
+	return v, nil
 }
