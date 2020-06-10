@@ -2,17 +2,10 @@ package vogue
 
 import "github.com/gdamore/tcell"
 
-func (v *Vogue) Fresh() error {
-	style := v.Config.GetStyle(
-		"status",
-		tcell.StyleDefault.Background(tcell.ColorWhite),
-	)
-	err := v.Status.Fresh(v.Screen, style)
-	if err != nil {
-		return err
-	}
+func (v *Vogue) Fresh() {
+	v.Status.Fresh(v.Screen, tcell.StyleDefault)
+	v.Tabs.Fresh(v.Screen, tcell.StyleDefault, tcell.StyleDefault)
+	v.Tabs.Buffer().Fresh(v.Screen)
 
 	v.Screen.Show()
-
-	return nil
 }

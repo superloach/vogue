@@ -7,15 +7,18 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/alecthomas/chroma"
+	"github.com/alecthomas/chroma/lexers"
 	"github.com/gdamore/tcell"
 )
 
 type Buffer struct {
-	Path string
-	Name string
-	Data string
-	Line int
-	Col  int
+	Path  string
+	Name  string
+	Data  string
+	Line  int
+	Col   int
+	Lexer chroma.Lexer
 }
 
 var Empties int = 0
@@ -72,6 +75,17 @@ func BufFile(path string) (*Buffer, error) {
 	return b, nil
 }
 
+func (b *Buffer) FindLexer() {
+	lex := lexers.Match(b.Name)
+	if lex == nil {
+		lex = lexers.Analyse(b.Data)
+	}
+}
+
 func (b *Buffer) Key(evk *tcell.EventKey) {
-	panic("buffer key stub")
+	println("buffer key stub")
+}
+
+func (b *Buffer) Fresh(screen tcell.Screen) {
+	print("buffer key stub")
 }

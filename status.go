@@ -8,7 +8,7 @@ type Status struct {
 	Right  func() string
 }
 
-func (s *Status) Fresh(screen tcell.Screen, style tcell.Style) error {
+func (s *Status) Fresh(screen tcell.Screen, style tcell.Style) {
 	var left, center, right string
 
 	w, _ := screen.Size()
@@ -43,6 +43,4 @@ func (s *Status) Fresh(screen tcell.Screen, style tcell.Style) error {
 	for i, r := range right {
 		screen.SetContent(roff+i, 0, r, nil, style)
 	}
-
-	return nil
 }

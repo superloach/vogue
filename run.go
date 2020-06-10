@@ -34,7 +34,7 @@ func (v *Vogue) Fini() {
 
 	err := v.Config.Save()
 	if err != nil {
-		panic(err)
+		println(err)
 	}
 }
 
@@ -53,5 +53,5 @@ func (v *Vogue) Key(evk *tcell.EventKey) {
 }
 
 func (v *Vogue) Mouse(evm *tcell.EventMouse) {
-	panic("vogue mouse stub")
+	println("vogue mouse stub")
 }
